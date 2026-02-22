@@ -17,6 +17,10 @@ When running multiple OpenClaw agents across different platforms (Feishu, Discor
 
 ![Dashboard Preview](docs/dashboard-preview.png)
 
+![Models Preview](docs/models-preview.png)
+
+![Sessions Preview](docs/sessions-preview.png)
+
 ## Getting Started
 
 ```bash
