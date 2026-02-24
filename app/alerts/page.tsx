@@ -66,7 +66,7 @@ export default function AlertsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // 定时检查告警
+  // 定时检查告警（不自动触发，由用户点击按钮触发）
   useEffect(() => {
     if (!config?.enabled) return;
     
@@ -84,10 +84,7 @@ export default function AlertsPage() {
         .finally(() => setChecking(false));
     };
 
-    // 立即检查一次
-    checkAlerts();
-
-    // 设置定时器
+    // 只设置定时器，不立即检查
     const timer = setInterval(checkAlerts, checkInterval * 60 * 1000);
     return () => clearInterval(timer);
   }, [config?.enabled, checkInterval, locale]);
