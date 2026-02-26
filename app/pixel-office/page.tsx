@@ -138,6 +138,8 @@ export default function PixelOfficePage() {
   const [broadcasts, setBroadcasts] = useState<Array<{ id: number; emoji: string; text: string }>>([])
   const [showActivityHeatmap, setShowActivityHeatmap] = useState(false)
   const activityHeatmapRef = useRef<Array<{ agentId: string; grid: number[][] }> | null>(null)
+  const [showPhonePanel, setShowPhonePanel] = useState(false)
+  const versionInfoRef = useRef<{ tag: string; name: string; publishedAt: string; body: string; htmlUrl: string } | null>(null)
   const forceEditorUpdate = useCallback(() => setEditorTick(t => t + 1), [])
 
   // Load saved layout and sound preference
@@ -287,6 +289,14 @@ export default function PixelOfficePage() {
     fetch('/api/activity-heatmap')
       .then(r => r.json())
       .then(data => { if (data.agents) activityHeatmapRef.current = data.agents })
+      .catch(() => {})
+  }, [])
+
+  // Preload version info
+  useEffect(() => {
+    fetch('/api/pixel-office/version')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data && data.tag) versionInfoRef.current = data })
       .catch(() => {})
   }, [])
 
@@ -544,9 +554,16 @@ export default function PixelOfficePage() {
         return tileX >= f.col && tileX < f.col + entry.footprintW &&
                tileY >= f.row && tileY < f.row + entry.footprintH
       })
+      const onPhone = office.layout.furniture.some(f => {
+        if (f.type !== 'phone') return false
+        const entry = getCatalogEntry(f.type)
+        if (!entry) return false
+        return tileX >= f.col && tileX < f.col + entry.footprintW &&
+               tileY >= f.row && tileY < f.row + entry.footprintH
+      })
       const onPhoto = photographRef.current && tileX >= 10 && tileX < 17 && tileY >= -0.5 && tileY < 1
       const onHeatmap = contributionsRef.current && contributionsRef.current.username !== 'mock' && tileX >= 1 && tileX < 10 && tileY >= -0.5 && tileY < 1
-      if (canvasRef.current) canvasRef.current.style.cursor = (onCamera || onPC || onLibrary || onWhiteboard || onClock || id !== null || onPhoto || onHeatmap) ? 'pointer' : 'default'
+      if (canvasRef.current) canvasRef.current.style.cursor = (onCamera || onPC || onLibrary || onWhiteboard || onClock || onPhone || id !== null || onPhoto || onHeatmap) ? 'pointer' : 'default'
     }
   }
 
@@ -620,6 +637,15 @@ export default function PixelOfficePage() {
               .then(data => { if (data.agents) activityHeatmapRef.current = data.agents })
               .catch(() => {})
           }
+        } else if (office.layout.furniture.some(f => {
+          if (f.type !== 'phone') return false
+          const entry = getCatalogEntry(f.type)
+          if (!entry) return false
+          return tileX >= f.col && tileX < f.col + entry.footprintW &&
+                 tileY >= f.row && tileY < f.row + entry.footprintH
+        })) {
+          // Click on phone — show version info
+          setShowPhonePanel(true)
         } else if (photographRef.current && tileX >= 10 && tileX < 17 && tileY >= -0.5 && tileY < 1) {
           // Click on wall photograph — fullscreen view
           setFullscreenPhoto(true)
@@ -1153,6 +1179,36 @@ export default function PixelOfficePage() {
                         </div>
                       )
                     })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* Phone panel — version info */}
+        {showPhonePanel && !isEditMode && (() => {
+          const info = versionInfoRef.current
+          return (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40" onClick={() => setShowPhonePanel(false)}>
+              <div className="w-80 max-h-[80%] overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-2xl p-4" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-semibold text-[var(--text)]">📱 OpenClaw Latest</span>
+                  <button onClick={() => setShowPhonePanel(false)} className="text-[var(--text-muted)] hover:text-[var(--text)] text-lg leading-none">×</button>
+                </div>
+                {!info ? (
+                  <div className="text-xs text-[var(--text-muted)] py-8 text-center">{t('common.loading')}</div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-[var(--accent)]">{info.name}</span>
+                      <span className="text-xs text-[var(--text-muted)]">{new Date(info.publishedAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="text-xs text-[var(--text)] whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto">{info.body}</div>
+                    <a href={info.htmlUrl} target="_blank" rel="noopener noreferrer"
+                      className="block text-center text-xs text-[var(--accent)] hover:underline">
+                      View on GitHub →
+                    </a>
                   </div>
                 )}
               </div>
