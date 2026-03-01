@@ -124,7 +124,7 @@ const LEG_SPECS: Array<{ anchorX: number; anchorY: number; restX: number; restY:
   { anchorX: 0.0, anchorY: 0.78, restX: 0.0, restY: 6.9, side: 1, group: 0 }, // right mid
   { anchorX: -1.1, anchorY: 0.78, restX: -4.7, restY: 5.9, side: 1, group: 1 }, // right back
 ]
-const LOGO_CARRY_FIXED_COUNT = 6
+const LOGO_CARRY_FIXED_COUNT = 8
 
 export class BugSystem {
   private bugs: BugEntity[] = []
