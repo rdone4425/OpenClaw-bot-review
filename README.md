@@ -69,7 +69,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 By default, the dashboard reads config from `~/.openclaw/openclaw.json`. To use a custom path, set the `OPENCLAW_HOME` environment variable:
 
 ```bash
-OPENCLAW_HOME=/opt/openclaw npm run dev
+OPENCLAW_HOME=/opt/openclaw 
+npm run dev
 ```
 
 ## Docker Deployment
@@ -162,5 +163,6 @@ npm run dev
 默认读取 `~/.openclaw/openclaw.json`，可通过环境变量指定自定义路径：
 
 ```bash
-OPENCLAW_HOME=/opt/openclaw npm run dev
+OPENCLAW_HOME=/opt/openclaw 
+npm run dev
 ```
