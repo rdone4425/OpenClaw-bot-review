@@ -99,6 +99,24 @@ docker run -d --name openclaw-dashboard -p 3000:3000 -e OPENCLAW_HOME=/opt/openc
 
 The repository also publishes multi-arch images to GHCR for `linux/amd64` and `linux/arm64`.
 
+### One-Command Run
+
+Linux (server):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rdone4425/OpenClaw-bot-review/main/scripts/run-dashboard.sh | bash
+```
+
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/rdone4425/OpenClaw-bot-review/main/scripts/run-dashboard.ps1 | iex
+```
+
+The scripts expect an `openclaw.json` on the host. For Linux, it defaults to `/root/.openclaw/openclaw.json`. For Windows, it defaults to `%USERPROFILE%\\.openclaw\\openclaw.json`.
+
+Do not commit your real `openclaw.json` to GitHub (it contains secrets). Keep it only on the server or your local machine.
+
 ```bash
 # Pull a tagged release image
 docker pull ghcr.io/rdone4425/openclaw-bot-review:v1.0.0
