@@ -1,0 +1,65 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add and fetch upstream
+        run: |
+          git remote add upstream https://github.com/xmanrui/OpenClaw-bot-review.git || git remote set-url upstream https://github.com/xmanrui/OpenClaw-bot-review.git
+          git fetch upstream main
+
+      - name: Prepare upstream merge
+        id: merge
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "up_to_date=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git merge --no-commit --no-ff upstream/main
+          echo "up_to_date=false" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update sync PR
+        if: steps.merge.outputs.up_to_date == 'false'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/sync-upstream
+          delete-branch: true
+          base: main
+          commit-message: "chore: sync upstream from xmanrui/OpenClaw-bot-review"
+          title: "chore: sync upstream from xmanrui/OpenClaw-bot-review"
+          body: |
+            ## Summary
+
+            - sync changes from `xmanrui/OpenClaw-bot-review`
+            - preserve this repository's custom commits by merging upstream into `main`
+
+            This PR was generated automatically by `.github/workflows/sync-upstream.yml`.

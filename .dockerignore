@@ -1,8 +1,12 @@
 node_modules
 .next
 .git
+.github
 .gitignore
 .claude
+docs
+prd
+test-results
 *.md
 .env*.local
 npm-debug.log*

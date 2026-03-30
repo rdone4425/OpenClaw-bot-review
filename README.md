@@ -95,6 +95,24 @@ docker run -d -p 3000:3000 openclaw-dashboard
 docker run -d --name openclaw-dashboard -p 3000:3000 -e OPENCLAW_HOME=/opt/openclaw -v /path/to/openclaw:/opt/openclaw openclaw-dashboard
 ```
 
+## GitHub Container Registry
+
+The repository also publishes multi-arch images to GHCR for `linux/amd64` and `linux/arm64`.
+
+```bash
+# Pull a tagged release image
+docker pull ghcr.io/rdone4425/openclaw-bot-review:v1.0.0
+
+# Run with your OpenClaw data mounted into the container
+docker run -d --name openclaw-dashboard -p 3000:3000 -e OPENCLAW_HOME=/opt/openclaw -v /path/to/openclaw:/opt/openclaw ghcr.io/rdone4425/openclaw-bot-review:v1.0.0
+```
+
+Publishing is handled by GitHub Actions:
+
+- Pull requests build the image for validation only
+- Tags matching `v*` publish the image to `ghcr.io/rdone4425/openclaw-bot-review`
+- Release tags publish both the tag itself and `latest`
+
 ---
 
 # OpenClaw Bot Dashboard（中文）
