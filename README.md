@@ -109,7 +109,7 @@ docker run -d --name openclaw-dashboard -p 3000:3000 -e OPENCLAW_HOME=/opt/openc
 
 Publishing is handled by GitHub Actions:
 
-- Pull requests build the image for validation only
+- Pull requests and pushes to `main` build the image for validation only
 - Tags matching `v*` publish the image to `ghcr.io/rdone4425/openclaw-bot-review`
 - Release tags publish both the tag itself and `latest`
 
